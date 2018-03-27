@@ -1,89 +1,134 @@
-module.exports = class ADS1115{
-	constructor(addr, config, comm){
-		this.data = config;
+module.exports = class ADS111x{
+	constructor(addr, comm, config){
+		if(typeof config != 'object') config = {};
+		this.config = Object.assign({
+			//Operational status/single-shot conversion start
+			//write: 0 = No Effect, 1 = Begin a single conversion
+			//read: 0 = Busy, 1: Not Busy
+			OSMode: 0,
+
+			//Programmable gain amplifier configuration
+			//0-6, 0 == 6.144v range, all others can be calculated as: (4.096 / (1 << (n-1)))v range
+			gain: 2,
+
+			//Operating Mode
+			//0=Continuous conversion mode, 1=Power-down single-shot mode
+			mode: 1,
+
+			//Data rate
+			//0=8SPS
+			//1-4 = (16 << (n-1))SPS
+			//5 = 250SPS
+			//6 = 475SPS
+			//7 = 860SPS
+			rate: 4,
+
+			//Comparator Mode
+			//0 = Traditional comparator with hysteresis, 1 = Window comparator
+			compMode: 0,
+
+			//Comparator Polarity
+			//0 = Active low, 1 = Active high
+			compPol: 0,
+
+			//Latching comparator
+			//0 = Non-latching, 1 = Latching
+			compLat: 0,
+
+			//Comparator queue
+			//0 = Assert after 1 conversion, 1 = 2 converions, 2 = 4 conversions, 3 = disabled
+			compQueue: 3,
+
+
+			//TODO: add handling for setting thresholds
+			//High threshold
+			highThresh: 32767,
+
+			//Low threshold
+			lowThresh: 32768,
+
+			//delay for conversion after writing config
+			delay: 500
+		}, config);
 		this.comm = comm;
 		this.addr = addr;
-		this.settable = [];
-		this.initialized = true;
-		if(typeof this.init != 'undefined'){
-			try{
-				this.init();
-			}catch(e){
-				console.log({'failed to initialize': e});
-				this.initialized = false;
-			}
-		}
 	}
-	init(){
-		this.iodir = 0;
-		this.data.ios = {};
-		for(var i=8;i>0;i--){
-			this.iodir = (this.iodir << 1) | (this.data["io_"+i] ? 0 : 1);
-			this.data.ios[i] = this.data["io_"+i] ? 1 : 0;
-		}
-		console.log(this.iodir);
-		Promise.all([
-			this.comm.writeBytes(this.addr, 0x00, this.iodir),
-			// this.comm.writeBytes(this.addr, 0x01, 0),
-			this.comm.writeBytes(this.addr, 0x06, this.iodir)
-		]).then().catch();
-		this.settable = ['all', 'channel_1', 'channel_2', 'channel_3', 'channel_4', 'channel_5', 'channel_6', 'channel_7', 'channel_8'];
+
+	writeConfig(mux){
+		var config = 	(this.config.OSMode << 15) |
+						(this.config.gain << 9) |
+						(this.config.mode << 8) |
+						(this.config.rate << 5) |
+						(this.config.compMode << 4) |
+						(this.config.compPol << 3) |
+						(this.config.compLat << 2) |
+						this.config.compQueue;
+
+		// console.log([
+		// 	(this.config.OSMode << 15).toString(16),
+		// 	(this.config.gain << 9).toString(16),
+		// 	(this.config.mode << 8).toString(16),
+		// 	(this.config.rate << 5).toString(16),
+		// 	(this.config.compMode << 4).toString(16),
+		// 	(this.config.compPol << 3).toString(16),
+		// 	(this.config.compLat << 2).toString(16),
+		// 	this.config.compQueue.toString(16),
+		// 	(mux << 12).toString(16)
+		// ]);
+		config |= (mux << 12);
+		return new Promise((fulfill, reject) => {
+			this.comm.writeBytes(this.addr, 1, (config >> 8), (config & 255)).then((res) => {
+				this.initialized = true;
+				fulfill(res);
+			}).catch((err) => {
+				this.initialized = false;
+				reject(err);
+			})
+		});
+	}
+
+	//The channel to read from
+	//if single == false, this will run in differential mode:
+	//0: 0 and 1
+	//1: 0 and 3
+	//2: 1 and 3
+	//3: 2 and 3
+	//if single == true this will test the value of the channel (0-3) against ground
+	getSingleShot(channel, single){
+		var sensor = this;
+		var OSMode = sensor.config.OSMode;
+		sensor.config.OSMode = 1;
+		return new Promise((fulfill, reject) => {
+			if(single) channel |= 4;
+			sensor.writeConfig(channel).then((res) => {
+				setTimeout(function(){
+					sensor.comm.readBytes(sensor.addr, 0, 2).then((res) => {
+						sensor.config.OSMode = OSMode;
+						fulfill((res[0] << 8) + res[1]);
+					}).catch(reject);
+				}, sensor.config.delay);
+			}).catch(reject);
+		});
 	}
 	get(){
 		var sensor = this;
 		return new Promise((fulfill, reject) => {
-			Promise.all([
-				sensor.comm.readByte(sensor.addr, 9),
-				//sensor.comm.readByte(sensor.addr, 10)
-			]).then((res) => {
-				sensor.input_status = res[0];
-				sensor.output_status = res[1];
-				var readings = sensor.parseStatus();
-				fulfill(readings);
+			sensor.comm.readBytes(sensor.addr, 0, 2).then((res) => {
+				fulfill((res[0] << 8) + res[1]);
 			}).catch(reject);
 		});
 	}
-	parseStatus(){
-		var ios = this.data.ios,
-			readings = {};
-		for(var i in ios){
-			if(ios[i] == 1) readings["channel_"+i] = this.output_status & (1 << (i-1)) ? 1 : 0;
-			else readings["channel_"+i] = this.input_status & (1 << (i-1)) ? 0 : 1;
+
+	getConfig(prop){
+		if(typeof this.config != 'undefined'){
+			return this.config[prop];
 		}
-		return readings;
+		return null;
 	}
-	set(topic, value){
-		var sensor = this;
-		return new Promise((fulfill, reject) => {
-			//sensor.get().then((res) => {
-				var status = sensor.output_status;
-				if(topic == 'all'){
-					if(status != value){
-						sensor.output_status = value;
-						sensor.comm.writeBytes(this.addr, 0x0A, value).then(fulfill(sensor.parseStatus())).catch(reject);
-					}else{
-						fulfill(res);
-					}
-				}else{
-					var channel = topic.split('_')[1];
-					if(value == 1){
-						status |= (1 << (channel-1));
-					}else if(value == 2){
-						status ^= (1 << (channel-1));
-					}else{
-						status &= ~(1 << (channel - 1));
-					}
-					if(sensor.output_status != status){
-						sensor.output_status = status;
-						sensor.comm.writeBytes(sensor.addr, 0x0A, status).then(fulfill(sensor.parseStatus())).catch(reject);
-					}else{
-						fulfill(sensor.parseStatus());
-					}
-				}
-			// }).catch((err) => {
-			// 	console.log(err);
-			// 	reject(err);
-			// });
-		});
+	setConfig(prop, value){
+		if(typeof this.config != 'undefined'){
+			return this.config[prop] = value;
+		}
+		return nul;
 	}
 }
