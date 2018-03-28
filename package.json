@@ -1,20 +1,24 @@
 {
-  "name": "@ncd/ncd-red-ads1115",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Trey Felton",
-  "license": "ISC",
-  "node-red": {
-    "nodes": {
-      "ncd-ads1115": "ncd-ads1115.js"
+    "name": "@ncd/ncd-red-ads1115",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+	"repository": {
+        "type": "git",
+        "url": "https://github.com/ncd-io/ncd-red-ads1115"
+    },
+    "author": "Trey Felton",
+    "license": "ISC",
+    "node-red": {
+        "nodes": {
+            "ncd-ads1115": "ncd-ads1115.js"
+        }
+    },
+    "dependencies": {
+        "@ncd/ncd-red-comm": "^1.0.0",
+        "promise-queue": "^2.2.5"
     }
-  },
-  "dependencies": {
-    "@ncd/ncd-red-comm": "^1.0.0",
-    "promise-queue": "^2.2.5"
-  }
 }

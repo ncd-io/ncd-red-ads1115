@@ -25,6 +25,7 @@ module.exports = function(RED){
 		}
 		var channels = {};
 		var channel_count = 0;
+		var cont_mode_channel = false;
 		for(var i=1;i<5;i++){
 			if(config['channel_'+i] != '_none'){
 				channels['channel_'+i] = config['channel_'+i]*1;
@@ -39,6 +40,7 @@ module.exports = function(RED){
 			var last_mux;
 			for(var i in channels){
 				last_mux = channels[i];
+				cont_mode_channel = i;
 			}
 			this.sensor.writeConfig(last_mux);
 		}else{
@@ -67,10 +69,12 @@ module.exports = function(RED){
 		var node = this;
 		var mult = config.output_mult*1;
 		function send_payload(_status){
-			if(_status.constructor != Object) _status *= mult;
-			else{
-				for(var i in _status) _status[i] *= mult;
+			if(cont_mode_channel){
+				var tmp = _status;
+				_status = {};
+				_status[cont_mode_channel] = tmp;
 			}
+			for(var i in _status) _status[i] *= mult;
 			var msg = [],
 				dev_status = {topic: 'device_status', payload: _status};
 			if(config.output_all){
@@ -142,6 +146,7 @@ module.exports = function(RED){
 					}
 					_node.sensor.writeConfig(last_mux);
 				}
+				console.log('interval for status');
 				setTimeout(() => {
 					get_status({sensor: sensor_pool[_node.id].node}, repeat, sensor_pool[_node.id].node);
 				}, 3000);

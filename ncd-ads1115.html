@@ -63,9 +63,10 @@
             return this.name || "ADS1115";
         },
 		outputLabels: function(i){
-			if(!this.output_all || i == 4) return 'Device Status';
+			if(!this.output_all) return 'Device Status';
 			var labels = [];
 			for(var j=1;j<5;j++) if(this["channel_"+j] != '_none') labels.push('Channel '+j);
+			labels.push('Device Status');
 			return labels[i];
 		},
 		oneditprepare: function() {
@@ -130,6 +131,41 @@
 		<label for="node-input-output_mult"><i class="icon-tag"></i> Output multiplier (0.000628 for mA)</label>
 		<input type="text" id="node-input-output_mult" value="1">
 	</div>
+	<h4>Chip Configuration</h4>
+	<div class="form-row">
+		<label for="node-input-gain"><i class="icon-tag"></i> Gain</label>
+		<select id="node-input-gain" value="1">
+		<option value="0">+/-6.144V (2/3)</option>
+		<option value="1">+/-4.096V range (1)</option>
+		<option value="2">+/-2.048V range (2)</option>
+		<option value="3">+/-1.024V range (4)</option>
+		<option value="4">+/-0.512V range (8)</option>
+		<option value="5">+/-0.256V range (16)</option>
+		</select>
+	</div>
+
+	<i>The "Auto" mode will determine how to configure the chip based on your other settings.</i><br/>
+	<div class="form-row">
+		<label for="node-input-mode"><i class="icon-tag"></i> Operating Mode</label>
+		<select id="node-input-mode" value="1">
+			<option value="2">Auto</option>
+			<option value="0">Continuous Conversion</option>
+			<option value="1">Power-down Single-shot</option>
+		</select>
+	</div>
+	<div class="form-row">
+		<label for="node-input-rate"><i class="icon-tag"></i> Rate</label>
+		<select id="node-input-rate" value="1">
+		<option value="0">8 SPS</option>
+		<option value="1">16 SPS</option>
+		<option value="2">32 SPS</option>
+		<option value="3">64 SPS</option>
+		<option value="4">128 SPS</option>
+		<option value="5">250 SPS</option>
+		<option value="6">475 SPS</option>
+		<option value="7">860 SPS</option>
+		</select>
+	</div>
 
 	<h4>Multiplexer Settings</h4>
 	<div class="form-row">
@@ -162,39 +198,6 @@
 		<select id="node-input-channel_4" value="1">
 			<option value="7">Single Ended</option>
 			<option value="_none">Disable</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-gain"><i class="icon-tag"></i> Gain</label>
-		<select id="node-input-gain" value="1">
-		<option value="0">+/-6.144V (2/3)</option>
-		<option value="1">+/-4.096V range (1)</option>
-		<option value="2">+/-2.048V range (2)</option>
-		<option value="3">+/-1.024V range (4)</option>
-		<option value="4">+/-0.512V range (8)</option>
-		<option value="5">+/-0.256V range (16)</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-mode"><i class="icon-tag"></i> Operating Mode</label>
-		<i>The "Auto" mode will determine how to configure the chip based on your other settings.</i><br/>
-		<select id="node-input-mode" value="1">
-			<option value="2">Auto</option>
-			<option value="0">Continuous Conversion</option>
-			<option value="1">Power-down Single-shot</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-rate"><i class="icon-tag"></i> Rate</label>
-		<select id="node-input-rate" value="1">
-		<option value="0">8 SPS</option>
-		<option value="1">16 SPS</option>
-		<option value="2">32 SPS</option>
-		<option value="3">64 SPS</option>
-		<option value="4">128 SPS</option>
-		<option value="5">250 SPS</option>
-		<option value="6">475 SPS</option>
-		<option value="7">860 SPS</option>
 		</select>
 	</div>
 
@@ -236,46 +239,21 @@
     <h3>I2C Connection</h3>
 	<p>Configure the connection you want to use to communicate to your I2C device. Native I2C and USB to I2C converters are supported.</p>
 	<h3>Device Address</h3>
-	<p>The MCP23008 exposes hardware pins to make it easily addressable, on the NCD version these pins are controlled with jumpers and have the following values:</p>
+	<p>The ADS1115 has a configurable I2C Address, the NCD board exposes an address pin to set it:</p>
 	<ul>
-		<li><b>None</b> 32</li>
-		<li><b>A0</b> 33</li>
-		<li><b>A1</b> 34</li>
-		<li><b>A0+A1</b> 35</li>
-		<li><b>A2</b> 36</li>
-		<li><b>A2+A0</b> 37</li>
-		<li><b>A2+A1</b> 38</li>
-		<li><b>All</b> 39</li>
+		<li><b>Uninstalled</b> 72</li>
+		<li><b>Installed</b> 73</li>
 	</ul>
 	<h3>Interval</h3>
 	<p>The interval defines the time between status checks. It is in milliseconds, and the interval starts after the previous check has finished.</p>
-	<h3>Message on Change</h3>
-	<p>If this option is set, the device will only generate an output message if the status of the inputs or outputs has changed since the last status check or command.</p>
 	<h3>Output All Channels</h3>
-	<p>By default this device will have 1 output, which will send a payload anytime it detects a status change on the device (or everyime it recieves a message with a topic of "get_status"). Use this option to enable seperate outputs for each channel.</p>
-	<h3>Channel Direction</h3>
-	<p>Each selected channel will be configured as an output. Any channels left unchecked will be pulled up internally and set as an input.</p>
-	<h3>Input values</h3>
-	<p>You can send commands to the device through the use of topics and payloads. Any input messages that don't contain a compatible topic will be ignored. The compatible topics are:</p>
-	<ul>
-		<li><b>get_status</b> Forces a status check outside of the normal interval.</li>
-		<li><b>all</b> Allows you to send a single byte to control all channels (see below)</li>
-		<li><b>channel_(n)</b> Addresses a specific channel (1-8), and expects a payload of 0 or 1 to turn the output off or on, respectively.</li>
-	</ul>
-	<i>When sending a single byte to control all channels, the LSB will control channel 1 and the MSB will control channel 8. Set bits turn the output on, unset bits turn the output off.</i>
-	<h3>Output Values</h3>
-	<p>When Output All Channels is selected, each output represents a channel, the topic will indicate the channel (channel_(n)), and the payload will be 1 or 0</p>
-	<p>The last output on the node (the only output if Output All Channels is not selected) will send an object as the payload keyed by the channel, with a 1 or 0 defining the status. A status of 1 on an output indicates that it is active, a status of 1 on an input means it is being pulled to ground.</p>
-	<p>i.e.:<br />
-	{<br/>
-		channel_1:1,<br/>
-		channel_2:0,<br/>
-		channel_3:0,<br/>
-		channel_4:0,<br/>
-		channel_5:1,<br/>
-		channel_6:1,<br/>
-		channel_7:0,<br/>
-		channel_8:0<br/>
-		}</p>
+	<p>By default this device will have 1 output, which will send a payload whenever it performs a read. Use this option to enable seperate outputs for each channel.</p>
+	<h3>Output multiplier</h3>
+	<p>All values will be multiplied by this before being sent with the payload.
 
+	<h3>Output Values</h3>
+	<p>When Output All Channels is selected, each output represents a channel, the topic will indicate the channel (channel_(n))</p>
+	<p>The last output on the node (the only output if Output All Channels is not selected) will send an object as the payload keyed by the channel.</p>
+	<h3>Other settings</h3>
+	<p>All of these settings are explained in detail in the data sheet. We have set the default values to reflect the most used configuration.</p>
 </script>
