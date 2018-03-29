@@ -1,4 +1,4 @@
-var comms = require('../ncd-red-comm/index.js');
+var comms = require('ncd-red-comm');
 var ADS1115 = require('./index.js');
 
 /*
