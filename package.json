@@ -1,5 +1,5 @@
 {
-    "name": "ncd-red-ads1115",
+    "name": "@ncd/ncd-red-ads1115",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
