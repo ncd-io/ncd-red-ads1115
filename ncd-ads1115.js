@@ -109,7 +109,6 @@ module.exports = function(RED){
 					var channel_names = [];
 					var queue = new Queue(1);
 
-					//_node.sensor.getSingleShot(channels[i])
 					for(var i in channels){
 						channel_names.push(i);
 						queue.add(() => {
@@ -147,7 +146,7 @@ module.exports = function(RED){
 					_node.sensor.writeConfig(last_mux);
 				}
 				console.log('interval for status');
-				setTimeout(() => {
+				sensor_pool[_node.id].timeout = setTimeout(() => {
 					get_status({sensor: sensor_pool[_node.id].node}, repeat, sensor_pool[_node.id].node);
 				}, 3000);
 			}
