@@ -55,6 +55,7 @@ module.exports = class ADS111x{
 	}
 
 	writeConfig(mux){
+		var sensor = this;
 		var config = 	(this.config.OSMode << 15) |
 						(this.config.gain << 9) |
 						(this.config.mode << 8) |
@@ -77,11 +78,11 @@ module.exports = class ADS111x{
 		// ]);
 		config |= (mux << 12);
 		return new Promise((fulfill, reject) => {
-			this.comm.writeBytes(this.addr, 1, (config >> 8), (config & 255)).then((res) => {
-				this.initialized = true;
+			sensor.comm.writeBytes(this.addr, 1, (config >> 8), (config & 255)).then((res) => {
+				sensor.initialized = true;
 				fulfill(res);
 			}).catch((err) => {
-				this.initialized = false;
+				sensor.initialized = false;
 				reject(err);
 			})
 		});
@@ -115,7 +116,10 @@ module.exports = class ADS111x{
 		return new Promise((fulfill, reject) => {
 			sensor.comm.readBytes(sensor.addr, 0, 2).then((res) => {
 				fulfill((res[0] << 8) + res[1]);
-			}).catch(reject);
+			}).catch((err) => {
+				sensor.initialized = false;
+				reject(err);
+			});
 		});
 	}
 

@@ -156,11 +156,20 @@ module.exports = function(RED){
 
 			get_status({sensor: node}, true, sensor_pool[this.id].node);
 		}
+		
 		device_status(node);
 		node.on('input', (msg) => {
 			if(msg.topic == 'get_status'){
 				get_status(msg, false, sensor_pool[this.id].node);
 			}
+		});
+
+		node.on('close', (removed, done) => {
+			if(removed){
+				clearTimeout(sensor_pool[node.id].timeout);
+				delete(sensor_pool[node.id]);
+			}
+			done();
 		});
 	}
 	RED.nodes.registerType("ncd-ads1115", NcdI2cDeviceNode)
