@@ -145,7 +145,6 @@ module.exports = function(RED){
 					}
 					_node.sensor.writeConfig(last_mux);
 				}
-				console.log('interval for status');
 				sensor_pool[_node.id].timeout = setTimeout(() => {
 					get_status({sensor: sensor_pool[_node.id].node}, repeat, sensor_pool[_node.id].node);
 				}, 3000);
