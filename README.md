@@ -1,5 +1,5 @@
 # ADS1115
-![ADS1115](./ADS1115_INA196_2C_11.png)
+[![ADS1115](./ADS1115_INA196_2C_11.png)](https://store.ncd.io/?post_type=product&s=ads1115&site_select=https%3A%2F%2Fstore.ncd.io%3Fpost_type%3Dproduct&fwp_product_type=sensors&fwp_interface=i2c-interface)
 
 ### Overview
 
