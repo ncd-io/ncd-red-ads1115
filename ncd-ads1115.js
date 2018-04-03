@@ -35,20 +35,27 @@ module.exports = function(RED){
 		if(_config.mode == 2){
 			_config.mode = (channel_count > 1) ? 1 : 0;
 		}
+
 		this.sensor = new ADS1115(this.addr, RED.nodes.getNode(config.connection).i2c, _config);
-		if(_config.mode == 0){
-			var last_mux;
-			for(var i in channels){
-				last_mux = channels[i];
-				cont_mode_channel = i;
-			}
-			this.sensor.writeConfig(last_mux);
-		}else{
-			for(var i in channels){
-				this.sensor.getSingleShot(channels[i]).then().catch();
-				break;
+
+		var node = this;
+
+		function init_sensor(){
+			if(_config.mode == 0){
+				var last_mux;
+				for(var i in channels){
+					last_mux = channels[i];
+					cont_mode_channel = i;
+				}
+				this.sensor.writeConfig(last_mux);
+			}else{
+				for(var i in channels){
+					node.sensor.getSingleShot(channels[i]).then().catch();
+					break;
+				}
 			}
 		}
+
 
 		sensor_pool[this.id] = {
 			sensor: this.sensor,
@@ -57,16 +64,15 @@ module.exports = function(RED){
 			node: this
 		}
 
-		function device_status(_node){
-			if(!_node.sensor.initialized){
-				_node.status({fill:"red",shape:"ring",text:"disconnected"});
+		function device_status(){
+			if(!node.sensor.initialized){
+				node.status({fill:"red",shape:"ring",text:"disconnected"});
 				return false;
 			}
-			_node.status({fill:"green",shape:"dot",text:"connected"});
+			node.status({fill:"green",shape:"dot",text:"connected"});
 			return true;
 		}
 
-		var node = this;
 		var mult = config.output_mult*1;
 		function send_payload(_status){
 			if(cont_mode_channel){
@@ -87,33 +93,31 @@ module.exports = function(RED){
 			}
 			node.send(msg);
 		}
-		function get_status(msg, repeat, _node){
-			if(repeat) clearTimeout(sensor_pool[_node.id].timeout);
-			if(device_status(_node)){
-				if(_node.sensor.config.mode == 0){
-					_node.sensor.get().then(send_payload).catch((err) => {
-						_node.send({error: err});
+
+		var queue = new Queue(1);
+
+		function get_status(repeat){
+			if(repeat) clearTimeout(sensor_pool[node.id].timeout);
+			if(device_status(node)){
+				if(node.sensor.config.mode == 0){
+					node.sensor.get().then(send_payload).catch((err) => {
+						node.send({error: err});
 					}).then(() => {
-						if(repeat){
-							if(_node.interval){
-								sensor_pool[_node.id].timeout = setTimeout(() => {
-									get_status({sensor: sensor_pool[_node.id].node}, true, sensor_pool[_node.id].node);
-								}, _node.interval);
-							}else{
-								sensor_pool[_node.id].polling = false;
-							}
+						if(repeat && node.interval){
+							clearTimeout(sensor_pool[node.id].timeout);
+							sensor_pool[node.id].timeout = setTimeout(() => {
+								if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
+							}, node.interval);
+						}else{
+							sensor_pool[node.id].polling = false;
 						}
 					});
 				}else{
 					var _status = {};
-					var channel_names = [];
-					var queue = new Queue(1);
-
 					for(var i in channels){
-						channel_names.push(i);
 						queue.add(() => {
 							return new Promise((fulfill, reject) => {
-								_node.sensor.getSingleShot(channels[i]).then((res) => {
+								node.sensor.getSingleShot(channels[i]).then((res) => {
 									_status[i] = res;
 									fulfill();
 								}).catch(reject);
@@ -124,29 +128,22 @@ module.exports = function(RED){
 						return new Promise((fulfill, reject) => {
 							send_payload(_status);
 							fulfill();
-							if(repeat){
-								if(_node.interval){
-									sensor_pool[_node.id].timeout = setTimeout(() => {
-										get_status({sensor: sensor_pool[_node.id].node}, true, sensor_pool[_node.id].node);
-									}, _node.interval);
-								}else{
-									sensor_pool[_node.id].polling = false;
-								}
+							if(repeat && node.interval){
+								clearTimeout(sensor_pool[node.id].timeout);
+								sensor_pool[node.id].timeout = setTimeout(() => {
+									if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
+								}, node.interval);
+							}else{
+								sensor_pool[node.id].polling = false;
 							}
 						});
 					})
 
 				}
 			}else{
-				if(_node.sensor.config.mode == 0){
-					var last_mux;
-					for(var i in channels){
-						last_mux = channels[i];
-					}
-					_node.sensor.writeConfig(last_mux);
-				}
-				sensor_pool[_node.id].timeout = setTimeout(() => {
-					get_status({sensor: sensor_pool[_node.id].node}, repeat, sensor_pool[_node.id].node);
+				init_sensor();
+				sensor_pool[node.id].timeout = setTimeout(() => {
+					if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
 				}, 3000);
 			}
 		}
@@ -156,7 +153,7 @@ module.exports = function(RED){
 
 			get_status({sensor: node}, true, sensor_pool[this.id].node);
 		}
-		
+
 		device_status(node);
 		node.on('input', (msg) => {
 			if(msg.topic == 'get_status'){
