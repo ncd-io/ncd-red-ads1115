@@ -107,7 +107,7 @@ module.exports = function(RED){
 							clearTimeout(sensor_pool[node.id].timeout);
 							sensor_pool[node.id].timeout = setTimeout(() => {
 								if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
-							}, node.interval);
+							}, sensor_pool[node.id].node.interval);
 						}else{
 							sensor_pool[node.id].polling = false;
 						}
@@ -117,8 +117,9 @@ module.exports = function(RED){
 					for(var i in channels){
 						queue.add(() => {
 							return new Promise((fulfill, reject) => {
-								node.sensor.getSingleShot(channels[i]).then((res) => {
-									_status[i] = res;
+								var chnl = i;
+								node.sensor.getSingleShot(channels[chnl]).then((res) => {
+									_status[chnl] = res;
 									fulfill();
 								}).catch(reject);
 							});
@@ -132,7 +133,7 @@ module.exports = function(RED){
 								clearTimeout(sensor_pool[node.id].timeout);
 								sensor_pool[node.id].timeout = setTimeout(() => {
 									if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
-								}, node.interval);
+								}, sensor_pool[node.id].node.interval);
 							}else{
 								sensor_pool[node.id].polling = false;
 							}
@@ -150,14 +151,13 @@ module.exports = function(RED){
 
 		if(node.interval && !sensor_pool[node.id].polling){
 			sensor_pool[node.id].polling = true;
-
-			get_status({sensor: node}, true, sensor_pool[this.id].node);
+			get_status(true);
 		}
 
 		device_status(node);
 		node.on('input', (msg) => {
 			if(msg.topic == 'get_status'){
-				get_status(msg, false, sensor_pool[this.id].node);
+				get_status(false);
 			}
 		});
 
