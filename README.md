@@ -26,4 +26,4 @@ The `test.js` file included in this library contains basic examples for use. The
 
 If you intend to use this on the Raspberry Pi, you must ensure that:
 1. I2C is enabled (there are plenty of tutorials on this that differ based on the Pi version.)
-2. Node, NPM, and Node-red should be updated to the latest stable versions. If you skip this step the ncd-red-comm dependency may not load properly.
+2. Node, NPM, and Node-red should be updated to the LTS versions. If you skip this step the ncd-red-comm dependency may not load properly.

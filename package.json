@@ -1,6 +1,6 @@
 {
     "name": "ncd-red-ads1115",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -17,7 +17,7 @@
         "i2c"
     ],
     "author": "Trey Felton",
-    "license": "ISC",
+    "license": "MIT",
     "node-red": {
         "nodes": {
             "ncd-ads1115": "ncd-ads1115.js"
