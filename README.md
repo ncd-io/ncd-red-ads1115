@@ -2,11 +2,11 @@
 
 ### Overview
 
-This library provides a class for the ADS1115, it relies on the ncd-red-comm library for communication, and includes a node-red node for the ADS1115. The ADS1115 is a 4-channel, precision, low-power, 16-bit, I2C compatible, analog-to-digital converters. [Ncd.io](https://ncd.io) manufactures a few different mini-modules that utilize this chip for different applications, you can see a [list here](https://store.ncd.io/?post_type=product&s=ads1115&site_select=https%3A%2F%2Fstore.ncd.io%3Fpost_type%3Dproduct&fwp_product_type=sensors&fwp_interface=i2c-interface).
+This library provides a class for the ADS1115, it relies on the ncd-red-comm library for communication, and includes a node-red node for the ADS1115. The ADS1115 is a 4-channel, precision, low-power, 16-bit, I2C compatible, analog-to-digital converters. [Ncd.io](https://ncd.io) manufactures a few different mini-modules that utilize this chip for different applications, you can see a [list here](https://store.ncd.io/?post_type=product&fwp_chip_name=ads1115).
 
 This library *should* work with the ADS1113 and ADS1114 chipsets as well, but it has not been tested.
 
-[![ADS1115](./ADS1115_INA196_2C_11.png)](https://store.ncd.io/?post_type=product&s=ads1115&site_select=https%3A%2F%2Fstore.ncd.io%3Fpost_type%3Dproduct&fwp_product_type=sensors&fwp_interface=i2c-interface)
+[![ADS1115](./ADS1115_INA196_2C_11.png)](https://store.ncd.io/?post_type=product&fwp_chip_name=ads1115)
 
 ### Installation
 
