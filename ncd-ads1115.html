@@ -70,8 +70,8 @@
 			return labels[i];
 		},
 		oneditprepare: function() {
-			$('multiplexer-settings').change(processMultiplexer);
-			if(typeof this.channel_1 != 'undefined') $('multiplexer-settings').change();
+			$('.multiplexer-settings').change(processMultiplexer);
+			if(typeof this.channel_1 != 'undefined') $('.multiplexer-settings').change();
 		},
 		oneditsave: function(){
 			if(!$('#node-input-output_all').is(':checked')){
@@ -88,10 +88,10 @@
     });
 	function processMultiplexer(){
 		var locks = {};
-		$('multiplexer-settings').prop('disabled', false);
+		$('.multiplexer-settings').prop('disabled', false);
 		var c1 = $('#node-input-channel_1').val();
 		if(c1 == "0"){
-			$('#node-input-channel_4').prop('disabled', 'disabled');
+			$('#node-input-channel_2').prop('disabled', 'disabled');
 			$('#node-input-channel_2').val("_none");
 		}
 		var c2 = $('#node-input-channel_2').val();
@@ -169,8 +169,8 @@
 
 	<h4>Multiplexer Settings</h4>
 	<div class="form-row">
-		<label for="node-input-channel_1" class="multiplexer-settings"><i class="icon-tag"></i> Channel 1</label>
-		<select id="node-input-channel_1" value="1">
+		<label for="node-input-channel_1"><i class="icon-tag"></i> Channel 1</label>
+		<select id="node-input-channel_1" class="multiplexer-settings" value="1">
 			<option value="0">Differential w/ Channel 2</option>
 			<option value="1">Differential w/ Channel 4</option>
 			<option value="4">Single Ended</option>
@@ -178,24 +178,24 @@
 		</select>
 	</div>
 	<div class="form-row">
-		<label for="node-input-channel_2" class="multiplexer-settings"><i class="icon-tag"></i> Channel 2</label>
-		<select id="node-input-channel_2" value="1">
+		<label for="node-input-channel_2"><i class="icon-tag"></i> Channel 2</label>
+		<select id="node-input-channel_2" class="multiplexer-settings" value="1">
 			<option value="2">Differential w/ Channel 4</option>
 			<option value="5">Single Ended</option>
 			<option value="_none">Disable</option>
 		</select>
 	</div>
 	<div class="form-row">
-		<label for="node-input-channel_3" class="multiplexer-settings"><i class="icon-tag"></i> Channel 3</label>
-		<select id="node-input-channel_3" value="1">
+		<label for="node-input-channel_3"><i class="icon-tag"></i> Channel 3</label>
+		<select id="node-input-channel_3" class="multiplexer-settings" value="1">
 			<option value="3">Differential w/ Channel 4</option>
 			<option value="6">Single Ended</option>
 			<option value="_none">Disable</option>
 		</select>
 	</div>
 	<div class="form-row">
-		<label for="node-input-channel_4" class="multiplexer-settings"><i class="icon-tag"></i> Channel 4</label>
-		<select id="node-input-channel_4" value="1">
+		<label for="node-input-channel_4"><i class="icon-tag"></i> Channel 4</label>
+		<select id="node-input-channel_4" class="multiplexer-settings" value="1">
 			<option value="7">Single Ended</option>
 			<option value="_none">Disable</option>
 		</select>
