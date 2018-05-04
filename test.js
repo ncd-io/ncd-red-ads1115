@@ -5,7 +5,7 @@ var ADS1115 = require('./index.js');
  * Allows use of a USB to I2C converter form ncd.io
  */
 var port = '/dev/tty.usbserial-DN03Q7F9';
-var serial = new comms.NcdSerial('/dev/tty.usbserial-DN03Q7F9', 115200);
+var serial = new comms.NcdSerial(port, 115200);
 var comm = new comms.NcdSerialI2C(serial, 0);
 
 /*

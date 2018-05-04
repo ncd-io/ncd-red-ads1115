@@ -1,6 +1,6 @@
 {
     "name": "ncd-red-ads1115",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -24,7 +24,7 @@
         }
     },
     "dependencies": {
-        "ncd-red-comm": "^1.4.0",
+        "ncd-red-comm": "^1.4.7",
         "promise-queue": "^2.2.5"
     }
 }
