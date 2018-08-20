@@ -47,7 +47,7 @@ module.exports = function(RED){
 					last_mux = channels[i];
 					cont_mode_channel = i;
 				}
-				this.sensor.writeConfig(last_mux);
+				node.sensor.writeConfig(last_mux);
 			}else{
 				for(var i in channels){
 					node.sensor.getSingleShot(channels[i]).then().catch();
