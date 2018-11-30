@@ -115,9 +115,9 @@ module.exports = function(RED){
 				}else{
 					var _status = {};
 					for(var i in channels){
+						let chnl = i;
 						queue.add(() => {
 							return new Promise((fulfill, reject) => {
-								var chnl = i;
 								node.sensor.getSingleShot(channels[chnl]).then((res) => {
 									_status[chnl] = res;
 									fulfill();
