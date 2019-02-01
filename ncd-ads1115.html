@@ -1,8 +1,4 @@
 <script type="text/javascript">
-	RED.comms.subscribe('ncd-dependencies', (t,d) => {
-
-		RED.notify(d);
-	})
     RED.nodes.registerType('ncd-ads1115',{
         category: 'NCD',
         color: '#a6bbcf',
@@ -70,168 +66,170 @@
 			return labels[i];
 		},
 		oneditprepare: function() {
-			$('.multiplexer-settings').change(processMultiplexer);
-			if(typeof this.channel_1 != 'undefined') $('.multiplexer-settings').change();
+			$('#ads1115_settings .multiplexer-settings').change(processMultiplexer);
+			if(typeof this.channel_1 != 'undefined') $('#ads1115_settings .multiplexer-settings').change();
 		},
 		oneditsave: function(){
-			if(!$('#node-input-output_all').is(':checked')){
+			if(!$('#ads1115_settings #node-input-output_all').is(':checked')){
 				this.outputs = 1;
 			}else{
 				var outputs = 1;
-				if($('#node-input-channel_1').val() != '_none') outputs+=1;
-				if($('#node-input-channel_2').val() != '_none') outputs+=1;
-				if($('#node-input-channel_3').val() != '_none') outputs+=1;
-				if($('#node-input-channel_4').val() != '_none') outputs+=1;
+				if($('#ads1115_settings #node-input-channel_1').val() != '_none') outputs+=1;
+				if($('#ads1115_settings #node-input-channel_2').val() != '_none') outputs+=1;
+				if($('#ads1115_settings #node-input-channel_3').val() != '_none') outputs+=1;
+				if($('#ads1115_settings #node-input-channel_4').val() != '_none') outputs+=1;
 				this.outputs = outputs;
 			}
 		}
     });
 	function processMultiplexer(){
 		var locks = {};
-		$('.multiplexer-settings').prop('disabled', false);
-		var c1 = $('#node-input-channel_1').val();
+		$('#ads1115_settings .multiplexer-settings').prop('disabled', false);
+		var c1 = $('#ads1115_settings #node-input-channel_1').val();
 		if(c1 == "0"){
 			$('#node-input-channel_2').prop('disabled', 'disabled');
 			$('#node-input-channel_2').val("_none");
 		}
-		var c2 = $('#node-input-channel_2').val();
-		var c3 = $('#node-input-channel_3').val();
+		var c2 = $('#ads1115_settings #node-input-channel_2').val();
+		var c3 = $('#ads1115_settings #node-input-channel_3').val();
 		if(c1 == "1" || c2 == "2" || c3 == "3"){
-			$('#node-input-channel_4').prop('disabled', 'disabled');
-			$('#node-input-channel_4').val("_none");
+			$('#ads1115_settings #node-input-channel_4').prop('disabled', 'disabled');
+			$('#ads1115_settings #node-input-channel_4').val("_none");
 		}
 	}
 </script>
 
 <script type="text/x-red" data-template-name="ncd-ads1115">
-	<div class="form-row">
-		<label for="node-input-name"><i class="icon-tag"></i> Name</label>
-		<input type="text" id="node-input-name" placeholder="Name">
-	</div>
-	<div class="form-row">
-		<label for="node-input-connection"><i class="icon-tag"></i> I2C Connection</label>
-		<select id="node-input-connection"></select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-addr"><i class="icon-tag"></i> Device Address</label>
-		<select id="node-input-addr">
-			<option value="72">72</option>
-			<option value="73">73</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-interval"><i class="icon-repeat"></i> Interval</label>
-		<input type="text" id="node-input-interval" placeholder="Interval">
-	</div>
-	<div class="form-row">
-		<label for="node-input-output_all"><i class="icon-tag"></i> Output all channels</label>
-		<input type="checkbox" id="node-input-output_all" value="1">
-	</div>
-	<div class="form-row">
-		<label for="node-input-output_mult"><i class="icon-tag"></i> Output multiplier (0.000628 for mA)</label>
-		<input type="text" id="node-input-output_mult" value="1">
-	</div>
-	<h4>Chip Configuration</h4>
-	<div class="form-row">
-		<label for="node-input-gain"><i class="icon-tag"></i> Gain</label>
-		<select id="node-input-gain" value="1">
-		<option value="0">+/-6.144V (2/3)</option>
-		<option value="1">+/-4.096V range (1)</option>
-		<option value="2">+/-2.048V range (2)</option>
-		<option value="3">+/-1.024V range (4)</option>
-		<option value="4">+/-0.512V range (8)</option>
-		<option value="5">+/-0.256V range (16)</option>
-		</select>
-	</div>
+	<div id="ads1115_settings">
+		<div class="form-row">
+			<label for="node-input-name"><i class="icon-tag"></i> Name</label>
+			<input type="text" id="node-input-name" placeholder="Name">
+		</div>
+		<div class="form-row">
+			<label for="node-input-connection"><i class="icon-tag"></i> I2C Connection</label>
+			<select id="node-input-connection"></select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-addr"><i class="icon-tag"></i> Device Address</label>
+			<select id="node-input-addr">
+				<option value="72">72</option>
+				<option value="73">73</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-interval"><i class="icon-repeat"></i> Interval in ms</label>
+			<input type="text" id="node-input-interval" placeholder="Interval">
+		</div>
+		<div class="form-row">
+			<label for="node-input-output_all"><i class="icon-tag"></i> Output all channels</label>
+			<input type="checkbox" id="node-input-output_all" value="1">
+		</div>
+		<div class="form-row">
+			<label for="node-input-output_mult"><i class="icon-tag"></i> Output multiplier (0.000628 for mA)</label>
+			<input type="text" id="node-input-output_mult" value="1">
+		</div>
+		<h4>Chip Configuration</h4>
+		<div class="form-row">
+			<label for="node-input-gain"><i class="icon-tag"></i> Gain</label>
+			<select id="node-input-gain" value="1">
+			<option value="0">+/-6.144V (2/3)</option>
+			<option value="1">+/-4.096V range (1)</option>
+			<option value="2">+/-2.048V range (2)</option>
+			<option value="3">+/-1.024V range (4)</option>
+			<option value="4">+/-0.512V range (8)</option>
+			<option value="5">+/-0.256V range (16)</option>
+			</select>
+		</div>
 
-	<i>The "Auto" mode will determine how to configure the chip based on your other settings.</i><br/>
-	<div class="form-row">
-		<label for="node-input-mode"><i class="icon-tag"></i> Operating Mode</label>
-		<select id="node-input-mode" value="1">
-			<option value="2">Auto</option>
-			<option value="0">Continuous Conversion</option>
-			<option value="1">Power-down Single-shot</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-rate"><i class="icon-tag"></i> Rate</label>
-		<select id="node-input-rate" value="1">
-		<option value="0">8 SPS</option>
-		<option value="1">16 SPS</option>
-		<option value="2">32 SPS</option>
-		<option value="3">64 SPS</option>
-		<option value="4">128 SPS</option>
-		<option value="5">250 SPS</option>
-		<option value="6">475 SPS</option>
-		<option value="7">860 SPS</option>
-		</select>
-	</div>
+		<i>The "Auto" mode will determine how to configure the chip based on your other settings.</i><br/>
+		<div class="form-row">
+			<label for="node-input-mode"><i class="icon-tag"></i> Operating Mode</label>
+			<select id="node-input-mode" value="1">
+				<option value="2">Auto</option>
+				<option value="0">Continuous Conversion</option>
+				<option value="1">Power-down Single-shot</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-rate"><i class="icon-tag"></i> Rate</label>
+			<select id="node-input-rate" value="1">
+			<option value="0">8 SPS</option>
+			<option value="1">16 SPS</option>
+			<option value="2">32 SPS</option>
+			<option value="3">64 SPS</option>
+			<option value="4">128 SPS</option>
+			<option value="5">250 SPS</option>
+			<option value="6">475 SPS</option>
+			<option value="7">860 SPS</option>
+			</select>
+		</div>
 
-	<h4>Multiplexer Settings</h4>
-	<div class="form-row">
-		<label for="node-input-channel_1"><i class="icon-tag"></i> Channel 1</label>
-		<select id="node-input-channel_1" class="multiplexer-settings" value="1">
-			<option value="0">Differential w/ Channel 2</option>
-			<option value="1">Differential w/ Channel 4</option>
-			<option value="4">Single Ended</option>
-			<option value="_none">Disable</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-channel_2"><i class="icon-tag"></i> Channel 2</label>
-		<select id="node-input-channel_2" class="multiplexer-settings" value="1">
-			<option value="2">Differential w/ Channel 4</option>
-			<option value="5">Single Ended</option>
-			<option value="_none">Disable</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-channel_3"><i class="icon-tag"></i> Channel 3</label>
-		<select id="node-input-channel_3" class="multiplexer-settings" value="1">
-			<option value="3">Differential w/ Channel 4</option>
-			<option value="6">Single Ended</option>
-			<option value="_none">Disable</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-channel_4"><i class="icon-tag"></i> Channel 4</label>
-		<select id="node-input-channel_4" class="multiplexer-settings" value="1">
-			<option value="7">Single Ended</option>
-			<option value="_none">Disable</option>
-		</select>
-	</div>
+		<h4>Multiplexer Settings</h4>
+		<div class="form-row">
+			<label for="node-input-channel_1"><i class="icon-tag"></i> Channel 1</label>
+			<select id="node-input-channel_1" class="multiplexer-settings">
+				<option value="0">Differential w/ Channel 2</option>
+				<option value="1">Differential w/ Channel 4</option>
+				<option value="4">Single Ended</option>
+				<option value="_none">Disable</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-channel_2"><i class="icon-tag"></i> Channel 2</label>
+			<select id="node-input-channel_2" class="multiplexer-settings">
+				<option value="2">Differential w/ Channel 4</option>
+				<option value="5">Single Ended</option>
+				<option value="_none">Disable</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-channel_3"><i class="icon-tag"></i> Channel 3</label>
+			<select id="node-input-channel_3" class="multiplexer-settings">
+				<option value="3">Differential w/ Channel 4</option>
+				<option value="6">Single Ended</option>
+				<option value="_none">Disable</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-channel_4"><i class="icon-tag"></i> Channel 4</label>
+			<select id="node-input-channel_4" class="multiplexer-settings">
+				<option value="7">Single Ended</option>
+				<option value="_none">Disable</option>
+			</select>
+		</div>
 
-	<h4>Comparator Settings</h4>
-	<i>These are here for completeness, they are only useful when the ALERT/RDY pin is exposed and used</i>
-	<div class="form-row">
-		<label for="node-input-compMode"><i class="icon-tag"></i> Comparator Mode</label>
-		<select id="node-input-compMode" value="1">
-			<option value="0">Traditional comparator w/ hysteresis</option>
-			<option value="1">Window comparator</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-compPol"><i class="icon-tag"></i> Comparator Polarity</label>
-		<select id="node-input-compPol" value="1">
-			<option value="0">Active low</option>
-			<option value="1">Active high</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-compLat"><i class="icon-tag"></i> Latching comparator</label>
-		<select id="node-input-compLat" value="1">
-			<option value="0">Non-latching</option>
-			<option value="1">Latching</option>
-		</select>
-	</div>
-	<div class="form-row">
-		<label for="node-input-compQueue"><i class="icon-tag"></i> Comparator Queue</label>
-		<select id="node-input-compQueue" value="1">
-			<option value="0">Assert after 1 conversion</option>
-			<option value="1">2 converions</option>
-			<option value="2">4 converions</option>
-			<option value="3">Disabled</option>
-		</select>
+		<h4>Comparator Settings</h4>
+		<i>These are here for completeness, they are only useful when the ALERT/RDY pin is exposed and used</i>
+		<div class="form-row">
+			<label for="node-input-compMode"><i class="icon-tag"></i> Comparator Mode</label>
+			<select id="node-input-compMode" value="1">
+				<option value="0">Traditional comparator w/ hysteresis</option>
+				<option value="1">Window comparator</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-compPol"><i class="icon-tag"></i> Comparator Polarity</label>
+			<select id="node-input-compPol" value="1">
+				<option value="0">Active low</option>
+				<option value="1">Active high</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-compLat"><i class="icon-tag"></i> Latching comparator</label>
+			<select id="node-input-compLat" value="1">
+				<option value="0">Non-latching</option>
+				<option value="1">Latching</option>
+			</select>
+		</div>
+		<div class="form-row">
+			<label for="node-input-compQueue"><i class="icon-tag"></i> Comparator Queue</label>
+			<select id="node-input-compQueue" value="1">
+				<option value="0">Assert after 1 conversion</option>
+				<option value="1">2 converions</option>
+				<option value="2">4 converions</option>
+				<option value="3">Disabled</option>
+			</select>
+		</div>
 	</div>
 </script>
 
