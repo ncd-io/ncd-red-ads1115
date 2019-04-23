@@ -50,7 +50,7 @@ module.exports = function(RED){
 				node.sensor.writeConfig(last_mux);
 			}else{
 				for(var i in channels){
-					node.sensor.getSingleShot(channels[i]).then().catch();
+					node.sensor.getSingleShot(channels[i], (i - 3) == 3).then().catch();
 					break;
 				}
 			}
@@ -62,7 +62,7 @@ module.exports = function(RED){
 			polling: false,
 			timeout: 0,
 			node: this
-		}
+		};
 
 		function device_status(){
 			if(!node.sensor.initialized){
@@ -85,7 +85,7 @@ module.exports = function(RED){
 				dev_status = {topic: 'device_status', payload: _status};
 			if(config.output_all){
 				for(var i in _status){
-					msg.push({topic: i, payload: _status[i]})
+					msg.push({topic: i, payload: _status[i]});
 				}
 				msg.push(dev_status);
 			}else{
@@ -118,7 +118,7 @@ module.exports = function(RED){
 						let chnl = i;
 						queue.add(() => {
 							return new Promise((fulfill, reject) => {
-								node.sensor.getSingleShot(channels[chnl]).then((res) => {
+								node.sensor.getSingleShot(channels[chnl], (chnl - 3) == 3).then((res) => {
 									_status[chnl] = res;
 									fulfill();
 								}).catch(reject);
@@ -138,7 +138,7 @@ module.exports = function(RED){
 								sensor_pool[node.id].polling = false;
 							}
 						});
-					})
+					});
 
 				}
 			}else{
@@ -169,5 +169,5 @@ module.exports = function(RED){
 			done();
 		});
 	}
-	RED.nodes.registerType("ncd-ads1115", NcdI2cDeviceNode)
-}
+	RED.nodes.registerType("ncd-ads1115", NcdI2cDeviceNode);
+};
