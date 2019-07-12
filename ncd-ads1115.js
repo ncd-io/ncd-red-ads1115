@@ -97,6 +97,7 @@ module.exports = function(RED){
 		var queue = new Queue(1);
 
 		function get_status(repeat){
+			if(!sensor_pool[node.id]) return;
 			if(repeat) clearTimeout(sensor_pool[node.id].timeout);
 			if(device_status(node)){
 				if(node.sensor.config.mode == 0){
